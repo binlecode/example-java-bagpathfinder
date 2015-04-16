@@ -154,7 +154,7 @@ public class BagPathFinder {
     }
 
     private static void usage() {
-        System.out.println("Usage: BagPathFinder <data_file_name>");
+        System.out.println("Usage: java -jar bagpathfinder-<version>.jar <data_file_name>");
     }
 
     private Vertex checkOrAddNodeWithName(Map<String, Vertex> nodeMap, String nodeName) {
