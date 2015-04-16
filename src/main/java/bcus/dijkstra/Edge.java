@@ -6,14 +6,14 @@ package bcus.dijkstra;
 public class Edge {
     // immutable fields
     private final String id;
-    private final Vertex sourceVertex;
-    private final Vertex destinationVertex;
+    private final Vertex source;
+    private final Vertex destination;
     private final int weight;
 
     public Edge(String id, Vertex sourceVertex, Vertex destinationVertex, int weight) {
         this.id = id;
-        this.sourceVertex = sourceVertex;
-        this.destinationVertex = destinationVertex;
+        this.source = sourceVertex;
+        this.destination = destinationVertex;
         this.weight = weight;
     }
 
@@ -21,12 +21,12 @@ public class Edge {
         return id;
     }
 
-    public Vertex getSourceVertex() {
-        return sourceVertex;
+    public Vertex getSource() {
+        return source;
     }
 
-    public Vertex getDestinationVertex() {
-        return destinationVertex;
+    public Vertex getDestination() {
+        return destination;
     }
 
     public int getWeight() {
@@ -37,8 +37,8 @@ public class Edge {
     public String toString() {
         return "Edge{" +
                 "id='" + id + '\'' +
-                ", sourceVertex=" + sourceVertex +
-                ", destinationVertex=" + destinationVertex +
+                ", source=" + source +
+                ", destination=" + destination +
                 ", weight=" + weight +
                 '}';
     }
