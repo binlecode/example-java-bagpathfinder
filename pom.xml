@@ -44,7 +44,7 @@
                 <configuration>
                     <!-- DO NOT include log4j.properties file in your Jar -->
                     <excludes>
-                        <!--<exclude>**/log4j.properties</exclude>-->
+                        <!--<exclude>**/**</exclude>-->
                     </excludes>
                     <archive>
                         <manifest>
