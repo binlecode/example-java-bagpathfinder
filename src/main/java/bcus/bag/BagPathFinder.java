@@ -14,7 +14,68 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Created by ble on 4/15/15.
+ * Airport Baggage - Pathfinding utility main class
+ *
+ * Denver International Airport has decided to give an automated baggage system another shot.
+ * The hardware and tracking systems from the previous attempt are still in place, they just
+ * need a system to route the baggage.  The system will route baggage checked, connecting,
+ * and terminating in Denver.
+ *
+ * This path finding utility will route bags to their flights or the proper baggage claim.
+ * The input describes the airport conveyor system, the departing flights, and the bags to be routed.
+ * The output is the optimal routing to get bags to their destinations.
+ * Bags with a flight id of “ARRIVAL” are terminating in Denver are routed to Baggage Claim.
+ *
+ * Input: The input consists of several sections.  The beginning of each section is marked by a line starting: “# Section:”
+ * Section 1: A weighted bi-directional graph describing the conveyor system.
+ * Format: <Node 1> <Node 2> <travel_time>
+ * Section 2: Departure list
+ * Format: <flight_id> <flight_gate> <destination> <flight_time>
+ * Section 3: Bag list
+ * Format: <bag_number> <entry_point> <flight_id>
+ *
+ * Output: The optimized route for each bag
+ * <Bag_Number> <point_1> <point_2> [<point_3>, …] : <total_travel_time>
+ * The output should be in the same order as the Bag list section of the input.
+ *
+ * Example Input:
+ * # Section: Conveyor System
+ * Concourse_A_Ticketing A5 5
+ * A5 BaggageClaim 5
+ * A5 A10 4
+ * A5 A1 6
+ * A1 A2 1
+ * A2 A3 1
+ * A3 A4 1
+ * A10 A9 1
+ * A9 A8 1
+ * A8 A7 1
+ * A7 A6 1
+ * # Section: Departures
+ * UA10 A1 MIA 08:00
+ * UA11 A1 LAX 09:00
+ * UA12 A1 JFK 09:45
+ * UA13 A2 JFK 08:30
+ * UA14 A2 JFK 09:45
+ * UA15 A2 JFK 10:00
+ * UA16 A3 JFK 09:00
+ * UA17 A4 MHT 09:15
+ * UA18 A5 LAX 10:15
+ * # Section: Bags
+ * 0001 Concourse_A_Ticketing UA12
+ * 0002 A5 UA17
+ * 0003 A2 UA10
+ * 0004 A8 UA18
+ * 0005 A7 ARRIVAL
+ * Example Output:
+ * 0001 Concourse_A_Ticketing A5 A1 : 11
+ * 0002 A5 A1 A2 A3 A4 : 9
+ * 0003 A2 A1 : 1
+ * 0004 A8 A9 A10 A5 : 6
+ * 0005 A7 A8 A9 A10 A5 BaggageClaim : 12
+ *
+ * Created by Bin Le (binle2002@hotmail.com) on 4/15/15.
+ *
  */
 public class BagPathFinder {
     public static final String KEYWORD_ARRIVAL = "ARRIVAL";
@@ -69,47 +130,59 @@ public class BagPathFinder {
         // initialize bag route best path request list
         List<BagRoute> bagRoutes = buildBagRouteRequests();
 
-        // execute algorithm for each bag route request
-        BagShortestPath bagShortestPath;
-        String bagShortestPathId;
-        List<Vertex> algorithmPath;
-        int totalTravelTime;
+        // calculate shortest path for each bag route request
         for (BagRoute bagRoute : bagRoutes) {
-            bagShortestPathId = BagShortestPath.buildPathIdFromRoute(bagRoute);
-            // check cache for shortest path record
-            if (bagShortestPathCache.containsPathForId(bagShortestPathId)) {
-                bagShortestPath = bagShortestPathCache.getPathById(bagShortestPathId);
-                // cache hit, save to bag route record
-                bagRoute.setPath(bagShortestPath.getPath());
-                bagRoute.setTotalTravelTime(bagShortestPath.getTravelTime());
-
-            } else {  // cache miss, run the algorithm
-                algorithm.execute(bagRoute.getSourceNode());
-                // we want to cache all paths calculated from the algorithm execution
-                for (Vertex node : nodeMap.values()) {
-                    if (node.getId().equals(bagRoute.getSourceNode().getId())) {
-                        continue;   // exclude source node itself
-                    }
-
-                    algorithmPath = algorithm.getPath(node);
-                    totalTravelTime = algorithm.getPathDistance(algorithmPath);
-                    bagShortestPath = new BagShortestPath(
-                            BagShortestPath.buildPathIdFromSourceAndDestinationNodes(bagRoute.getSourceNode(), node),
-                            algorithmPath, totalTravelTime);
-                    bagShortestPathCache.putPath(bagShortestPath);
-
-                    // save destination node related shortest path to bag route record
-                    if (node.getId().equals(bagRoute.getDestinationNode().getId())) {
-                        bagRoute.setPath(algorithmPath);
-                        bagRoute.setTotalTravelTime(totalTravelTime);
-                    }
-                }
-            }
+            calculateAndSaveShortestPathToBagRouteWithCache(bagRoute, algorithm);
         }
 
+        // print out results
         System.out.println("Calculated bag routes:");
         for (BagRoute bagRoute : bagRoutes) {
             System.out.println(formatBagRoute(bagRoute));
+        }
+    }
+
+    /**
+     * Calculates the shortest path for given bag route request, and saves back to it.
+     * A {@link BagShortestPathCache} cache is used for shortest path caching and look-up to avoid redundant algorithm
+     * executions.
+     * @param bagRoute  the {@link BagRoute} object having the route request
+     * @param algorithm  the initialized Dijkstra algorithm (already loaded with graph)
+     */
+    protected void calculateAndSaveShortestPathToBagRouteWithCache(BagRoute bagRoute, DijkstraAlgorithm algorithm) {
+        BagShortestPath bagShortestPath;
+        List<Vertex> algorithmPath;
+        int totalTravelTime;
+
+        String bagShortestPathId = BagShortestPath.buildPathIdFromRoute(bagRoute);
+        // check cache for shortest path record
+        if (bagShortestPathCache.containsPathForId(bagShortestPathId)) {
+            bagShortestPath = bagShortestPathCache.getPathById(bagShortestPathId);
+            // cache hit, save to bag route record
+            bagRoute.setPath(bagShortestPath.getPath());
+            bagRoute.setTotalTravelTime(bagShortestPath.getTravelTime());
+
+        } else {  // cache miss, run the algorithm
+            algorithm.execute(bagRoute.getSourceNode());
+            // we want to cache all paths calculated from the algorithm execution
+            for (Vertex node : nodeMap.values()) {
+                if (node.getId().equals(bagRoute.getSourceNode().getId())) {
+                    continue;   // exclude source node itself
+                }
+
+                algorithmPath = algorithm.getPath(node);
+                totalTravelTime = algorithm.getPathDistance(algorithmPath);
+                bagShortestPath = new BagShortestPath(
+                        BagShortestPath.buildPathIdFromSourceAndDestinationNodes(bagRoute.getSourceNode(), node),
+                        algorithmPath, totalTravelTime);
+                bagShortestPathCache.putPath(bagShortestPath);
+
+                // save destination node related shortest path to bag route record
+                if (node.getId().equals(bagRoute.getDestinationNode().getId())) {
+                    bagRoute.setPath(algorithmPath);
+                    bagRoute.setTotalTravelTime(totalTravelTime);
+                }
+            }
         }
     }
 
