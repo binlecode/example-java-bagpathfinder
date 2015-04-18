@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by ble on 2015/4/17.
  */
-public class TestBagPath {
+public class TestBagShortestPath {
 
     @Test
     public void testBuilder() {
@@ -27,7 +27,7 @@ public class TestBagPath {
         bagRoute.setPath(path);
         bagRoute.setTotalTravelTime(totalTravelTime);
 
-        BagPath bagPath = BagPath.buildBagPath(bagRoute);
+        BagShortestPath bagPath = BagShortestPath.buildBagPath(bagRoute);
 
         Assert.assertEquals("A1,A2", bagPath.getId());
         Assert.assertEquals(10, bagPath.getTravelTime());
