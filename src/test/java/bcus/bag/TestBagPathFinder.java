@@ -1,10 +1,10 @@
 package bcus.bag;
 
 
-import bcus.dijkstra.DijkstraAlgorithm;
 import bcus.dijkstra.Edge;
 import bcus.dijkstra.Graph;
 import bcus.dijkstra.Vertex;
+import junit.framework.TestCase;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,16 +15,18 @@ import java.util.List;
 /**
  * Created by ble on 4/15/15.
  */
-public class TestBagPathFinder {
+public class TestBagPathFinder extends TestCase {
     private BagPathFinder bagPathFinder = new BagPathFinder();
 
     @Before
-    public void beforeEach() throws IOException {
-//        bagPathFinder.readSections(getClass().getClassLoader().getResource("sample_data.txt").getFile());
+    public void beforeEach() {
+        // place holder
     }
 
     @Test
     public void testReadSections() throws IOException {
+        System.out.println(">> running test: " + getName());
+
         bagPathFinder.readSections(getClass().getClassLoader().getResource("sample_data.txt").getFile());
 
         Assert.assertTrue(bagPathFinder.conveyorPathList.size() > 0);
@@ -45,6 +47,8 @@ public class TestBagPathFinder {
 
     @Test
     public void testBuildConveyorGraph() throws IOException {
+        System.out.println(">> running test: " + getName());
+
         bagPathFinder.readSections(getClass().getClassLoader().getResource("sample_data.txt").getFile());
         Graph conveyorGraph = bagPathFinder.buildConveyorGraph();
 
@@ -59,11 +63,12 @@ public class TestBagPathFinder {
         }
 
         Assert.assertEquals(BagPathFinder.KEYWORD_BAGGAGE_CLAIM, bagPathFinder.nodeMap.get("BaggageClaim").getName());
-
     }
 
     @Test
     public void testBuildBagRouteRequests() throws IOException {
+        System.out.println(">> running test: " + getName());
+
         bagPathFinder.readSections(getClass().getClassLoader().getResource("sample_data.txt").getFile());
         Graph conveyorGraph = bagPathFinder.buildConveyorGraph();
         List<BagRoute> bagRouteRequests = bagPathFinder.buildBagRouteRequests();
@@ -76,6 +81,8 @@ public class TestBagPathFinder {
 
     @Test
     public void testRunBagPathFindingForFile() {
+        System.out.println(">> running test: " + getName());
+
         bagPathFinder.runBagPathFindingForFile(getClass().getClassLoader().getResource("sample_data.txt").getFile());
     }
 
