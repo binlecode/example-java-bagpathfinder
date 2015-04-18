@@ -41,7 +41,11 @@ public class BagPathFinder {
         }
 
         String file = args[0];
-        new BagPathFinder().runBagPathFindingForFile(file);
+        try {
+            new BagPathFinder().runBagPathFindingForFile(file);
+        } catch (Exception e) {
+            System.out.println("oops, something went wrong: " + e.getMessage());
+        }
     }
 
     /**
@@ -54,6 +58,7 @@ public class BagPathFinder {
             readSections(file);
             graph = buildConveyorGraph();
         } catch (IOException e) {
+            System.out.println("oops, something wen wrong: " + e.getMessage());
             e.printStackTrace();
             return;
         }
@@ -70,20 +75,16 @@ public class BagPathFinder {
         List<Vertex> algorithmPath;
         int totalTravelTime;
         for (BagRoute bagRoute : bagRoutes) {
-
-            System.out.println(">> bag route request: " + bagRoute);
             bagShortestPathId = BagShortestPath.buildPathIdFromRoute(bagRoute);
-
+            // check cache for shortest path record
             if (bagShortestPathCache.containsPathForId(bagShortestPathId)) {
                 bagShortestPath = bagShortestPathCache.getPathById(bagShortestPathId);
-                System.out.println("cache hit for bag shortest path: " + bagShortestPath);
+                // cache hit, save to bag route record
                 bagRoute.setPath(bagShortestPath.getPath());
                 bagRoute.setTotalTravelTime(bagShortestPath.getTravelTime());
 
-            } else {
-                System.out.println("cache miss, execute algorithm ...");
+            } else {  // cache miss, run the algorithm
                 algorithm.execute(bagRoute.getSourceNode());
-
                 // we want to cache all paths calculated from the algorithm execution
                 for (Vertex node : nodeMap.values()) {
                     if (node.getId().equals(bagRoute.getSourceNode().getId())) {
@@ -92,32 +93,24 @@ public class BagPathFinder {
 
                     algorithmPath = algorithm.getPath(node);
                     totalTravelTime = algorithm.getPathDistance(algorithmPath);
-
                     bagShortestPath = new BagShortestPath(
                             BagShortestPath.buildPathIdFromSourceAndDestinationNodes(bagRoute.getSourceNode(), node),
                             algorithmPath, totalTravelTime);
-                    System.out.println("caching shortest path: " + bagShortestPath);
                     bagShortestPathCache.putPath(bagShortestPath);
 
+                    // save destination node related shortest path to bag route record
                     if (node.getId().equals(bagRoute.getDestinationNode().getId())) {
                         bagRoute.setPath(algorithmPath);
                         bagRoute.setTotalTravelTime(totalTravelTime);
-                        System.out.println("  -> recording path and travel time for current bag route request: " + bagRoute);
                     }
                 }
             }
-
         }
 
-        //todo: post-processing for bag route path result list
         System.out.println("Calculated bag routes:");
         for (BagRoute bagRoute : bagRoutes) {
             System.out.println(formatBagRoute(bagRoute));
         }
-    }
-
-    private boolean isFoundInCache(BagRoute bagRoute) {
-        return false;
     }
 
     /**
