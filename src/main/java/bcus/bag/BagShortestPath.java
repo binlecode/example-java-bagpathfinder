@@ -13,8 +13,8 @@ public class BagShortestPath {
     private final List<Vertex> path;
     private final int travelTime;
 
-    static public BagShortestPath buildBagPath(BagRoute bagRoute) {
-        String id = bagRoute.getSourceNode().getId() + "," + bagRoute.getDestinationNode().getId();
+    static public BagShortestPath buildPathFromRoute(BagRoute bagRoute) {
+        String id = buildPathIdFromRoute(bagRoute);
         return new BagShortestPath(id, bagRoute.getPath(), bagRoute.getTotalTravelTime());
     }
 
@@ -34,5 +34,22 @@ public class BagShortestPath {
 
     public int getTravelTime() {
         return travelTime;
+    }
+
+    static public String buildPathIdFromRoute(BagRoute bagRoute) {
+        return buildPathIdFromSourceAndDestinationNodes(bagRoute.getSourceNode(), bagRoute.getDestinationNode());
+    }
+
+    static public String buildPathIdFromSourceAndDestinationNodes(Vertex sourceNode, Vertex destinationNode) {
+        return sourceNode.getId() + "," + destinationNode.getId();
+    }
+
+    @Override
+    public String toString() {
+        return "BagShortestPath{" +
+                "id='" + id + '\'' +
+                ", path=" + path +
+                ", travelTime=" + travelTime +
+                '}';
     }
 }

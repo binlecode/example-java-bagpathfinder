@@ -69,15 +69,17 @@ public class TestDijkstraAlgorithm {
         DijkstraAlgorithm algorithm = new DijkstraAlgorithm(graph);
         algorithm.execute(nodes.get(nodeNames.indexOf("Concourse_A_Ticketing")));
         List<Vertex> path = algorithm.getPath(nodes.get(nodeNames.indexOf("A1")));
-
+        Assert.assertTrue(path.size() == 3);
+        Assert.assertEquals(11, algorithm.getPathDistance(path));
         for (Vertex node : path) {
             System.out.println(node);
         }
-
         System.out.println("total travel time: " + algorithm.getPathDistance(path));
 
-
-
+        algorithm.execute(nodes.get(nodeNames.indexOf("A1")));
+        path = algorithm.getPath(nodes.get(nodeNames.indexOf("A1")));
+        Assert.assertNull(path);
+        Assert.assertEquals(0, algorithm.getPathDistance(path));
     }
 
 }

@@ -2,6 +2,7 @@ package bcus.bag;
 
 import bcus.dijkstra.Vertex;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -12,22 +13,30 @@ import java.util.List;
  */
 public class TestBagShortestPath {
 
-    @Test
-    public void testBuilder() {
-        Vertex sourceNode = new Vertex("A1", "A1");
-        Vertex destinationNode = new Vertex("A2", "A2");
+    Vertex sourceNode = new Vertex("A1", "A1");
+    Vertex destinationNode = new Vertex("A2", "A2");
+    BagRoute bagRoute = new BagRoute("0001", sourceNode, destinationNode, "AAA");
+    List<Vertex> path = new ArrayList<Vertex>();
 
-        List<Vertex> path = new ArrayList<Vertex>();
+    int totalTravelTime = 10;
+
+    @Before
+    public void beforeEach() {
         path.add(sourceNode);
         path.add(destinationNode);
+    }
 
-        int totalTravelTime = 10;
+    @Test
+    public void testBuildPathIdFromRoute() {
+        Assert.assertEquals("A1,A2", BagShortestPath.buildPathIdFromRoute(bagRoute));
+    }
 
-        BagRoute bagRoute = new BagRoute("0001", sourceNode, destinationNode, "AAA");
+    @Test
+    public void testBuilder() {
         bagRoute.setPath(path);
         bagRoute.setTotalTravelTime(totalTravelTime);
 
-        BagShortestPath bagPath = BagShortestPath.buildBagPath(bagRoute);
+        BagShortestPath bagPath = BagShortestPath.buildPathFromRoute(bagRoute);
 
         Assert.assertEquals("A1,A2", bagPath.getId());
         Assert.assertEquals(10, bagPath.getTravelTime());
