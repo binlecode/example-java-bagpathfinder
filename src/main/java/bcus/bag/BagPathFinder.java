@@ -28,9 +28,10 @@ public class BagPathFinder {
     Map<String, Vertex> nodeMap = new HashMap<String, Vertex>();
     Map<String, Edge> edgeMap = new HashMap<String, Edge>();
 
+    BagShortestPathCache bagShortestPathCache = new BagShortestPathCache();
 
     /**
-     * main entry for command line execution
+     * Main entry for command line execution
      * @param args takes only 1 argument for data file name
      */
     public static void main(String[] args) {
@@ -44,7 +45,7 @@ public class BagPathFinder {
     }
 
     /**
-     * main public API method for path finding
+     * Main public API method for path finding
      * @param file  input file that contains the section data
      */
     public void runBagPathFindingForFile(String file) {
@@ -64,10 +65,48 @@ public class BagPathFinder {
         List<BagRoute> bagRoutes = buildBagRouteRequests();
 
         // execute algorithm for each bag route request
+        BagShortestPath bagShortestPath;
+        String bagShortestPathId;
+        List<Vertex> algorithmPath;
+        int totalTravelTime;
         for (BagRoute bagRoute : bagRoutes) {
-            algorithm.execute(bagRoute.getSourceNode());
-            bagRoute.setPath(algorithm.getPath(bagRoute.getDestinationNode()));
-            bagRoute.setTotalTravelTime(algorithm.getPathDistance(bagRoute.getPath()));
+
+            System.out.println(">> bag route request: " + bagRoute);
+            bagShortestPathId = BagShortestPath.buildPathIdFromRoute(bagRoute);
+
+            if (bagShortestPathCache.containsPathForId(bagShortestPathId)) {
+                bagShortestPath = bagShortestPathCache.getPathById(bagShortestPathId);
+                System.out.println("cache hit for bag shortest path: " + bagShortestPath);
+                bagRoute.setPath(bagShortestPath.getPath());
+                bagRoute.setTotalTravelTime(bagShortestPath.getTravelTime());
+
+            } else {
+                System.out.println("cache miss, execute algorithm ...");
+                algorithm.execute(bagRoute.getSourceNode());
+
+                // we want to cache all paths calculated from the algorithm execution
+                for (Vertex node : nodeMap.values()) {
+                    if (node.getId().equals(bagRoute.getSourceNode().getId())) {
+                        continue;   // exclude source node itself
+                    }
+
+                    algorithmPath = algorithm.getPath(node);
+                    totalTravelTime = algorithm.getPathDistance(algorithmPath);
+
+                    bagShortestPath = new BagShortestPath(
+                            BagShortestPath.buildPathIdFromSourceAndDestinationNodes(bagRoute.getSourceNode(), node),
+                            algorithmPath, totalTravelTime);
+                    System.out.println("caching shortest path: " + bagShortestPath);
+                    bagShortestPathCache.putPath(bagShortestPath);
+
+                    if (node.getId().equals(bagRoute.getDestinationNode().getId())) {
+                        bagRoute.setPath(algorithmPath);
+                        bagRoute.setTotalTravelTime(totalTravelTime);
+                        System.out.println("  -> recording path and travel time for current bag route request: " + bagRoute);
+                    }
+                }
+            }
+
         }
 
         //todo: post-processing for bag route path result list
@@ -77,6 +116,9 @@ public class BagPathFinder {
         }
     }
 
+    private boolean isFoundInCache(BagRoute bagRoute) {
+        return false;
+    }
 
     /**
      * Reads section data from given file
@@ -156,15 +198,14 @@ public class BagPathFinder {
 
     private String formatBagRoute(BagRoute bagRoute) {
         StringBuilder sb = new StringBuilder(bagRoute.getRequestIndex());
-        for (Vertex node : bagRoute.getPath()) {
-            sb.append(" ").append(node.getName());
+        if (bagRoute.getPath() != null) {
+            for (Vertex node : bagRoute.getPath()) {
+                sb.append(" ").append(node.getName());
+            }
         }
         sb.append(" : ").append(bagRoute.getTotalTravelTime());
         return sb.toString();
     }
-
-
-
 
     private Vertex checkOrAddNodeWithName(Map<String, Vertex> nodeMap, String nodeName) {
         Vertex node;

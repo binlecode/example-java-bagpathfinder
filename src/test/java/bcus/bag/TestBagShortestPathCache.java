@@ -16,31 +16,36 @@ public class TestBagShortestPathCache {
     private String id1 = "source1,destination1";
     private BagShortestPath path1 = new BagShortestPath(id1, new ArrayList<Vertex>(), 128);
 
+
+
     @Before
     public void beforeEach() {
     }
 
     @Test
-    public void testPutInCache() {
-        Assert.assertFalse(cache.hasKey(id1));
-        Assert.assertNull(cache.get(id1));
-
-        cache.put(path1);
-        Assert.assertEquals(1, cache.getSize());
-
-        cache.put(path1);
-        Assert.assertEquals(1, cache.getSize());
+    public void testConstainsCheck() {
+        Assert.assertFalse(cache.containsPathForId("BAD,ID"));
     }
 
     @Test
-    public void tetGetFromCache() {
-        cache.put(path1);
-        Assert.assertNotNull(cache.get(id1));
+    public void testPutPath() {
+        Assert.assertFalse(cache.containsPathForId(id1));
+        Assert.assertNull(cache.getPathById(id1));
 
-        Assert.assertEquals(id1, cache.get(id1).getId());
+        cache.putPath(path1);
+        Assert.assertEquals(1, cache.size());
+        Assert.assertTrue(cache.containsPathForId(id1));
+        Assert.assertTrue(cache.containsPath(path1));
 
-        String id2 = "source2,destination2";
-        Assert.assertNull(cache.get(id2));
+        cache.putPath(path1);   // should have no duplicates
+        Assert.assertEquals(1, cache.size());
+    }
+
+    @Test
+    public void tetGetPathbyId() {
+        cache.putPath(path1);
+        Assert.assertNotNull(cache.getPathById(id1));
+        Assert.assertEquals(id1, cache.getPathById(id1).getId());
     }
 
 }

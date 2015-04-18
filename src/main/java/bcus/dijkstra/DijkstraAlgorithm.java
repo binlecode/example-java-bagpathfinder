@@ -127,7 +127,7 @@ public class DijkstraAlgorithm {
 
     /**
      * Calculate the path from the source node to the given target node.
-     * Path is calculated from back tracing the steps from the target node.
+     * Path is calculated by back tracing the steps from the target node.
      * @param target
      * @return  a list of nodes from source node to target node node
      */
@@ -149,9 +149,10 @@ public class DijkstraAlgorithm {
     }
 
     public int getPathDistance(List<Vertex> path) {
-        if (path.size() < 2) {
-            return Integer.MAX_VALUE;
+        if (path == null) {
+            return 0;   // there's no path, source and destination must be the same in this case
         }
+
         Iterator<Vertex> pathIterator = path.iterator();
         Vertex fromNode = pathIterator.next();
         Vertex toNode;
