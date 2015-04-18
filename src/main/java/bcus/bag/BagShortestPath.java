@@ -7,18 +7,18 @@ import java.util.List;
 /**
  * Created by ble on 2015/4/17.
  */
-public class BagPath {
+public class BagShortestPath {
 
     private final String id;
     private final List<Vertex> path;
     private final int travelTime;
 
-    static public BagPath buildBagPath(BagRoute bagRoute) {
+    static public BagShortestPath buildBagPath(BagRoute bagRoute) {
         String id = bagRoute.getSourceNode().getId() + "," + bagRoute.getDestinationNode().getId();
-        return new BagPath(id, bagRoute.getPath(), bagRoute.getTotalTravelTime());
+        return new BagShortestPath(id, bagRoute.getPath(), bagRoute.getTotalTravelTime());
     }
 
-    public BagPath(String id, List<Vertex> path, int travelTime) {
+    public BagShortestPath(String id, List<Vertex> path, int travelTime) {
         this.id = id;
         this.path = path;
         this.travelTime = travelTime;

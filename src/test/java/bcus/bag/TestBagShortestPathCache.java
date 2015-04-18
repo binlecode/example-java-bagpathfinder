@@ -10,11 +10,11 @@ import java.util.ArrayList;
 /**
  * Created by ble on 2015/4/17.
  */
-public class TestBagPathCache {
+public class TestBagShortestPathCache {
 
-    private BagPathCache cache = new BagPathCache();
+    private BagShortestPathCache cache = new BagShortestPathCache();
     private String id1 = "source1,destination1";
-    private BagPath path1 = new BagPath(id1, new ArrayList<Vertex>(), 128);
+    private BagShortestPath path1 = new BagShortestPath(id1, new ArrayList<Vertex>(), 128);
 
     @Before
     public void beforeEach() {
