@@ -24,7 +24,6 @@ public class TestEdge {
         Assert.assertEquals(edge.getSource(), new Vertex("0", "Concourse_A_Ticketing"));
         Assert.assertEquals(edge.getDestination(), new Vertex("999", "BaggageClaim"));
         Assert.assertEquals(edge.getWeight(), 5);
-
     }
 
 
