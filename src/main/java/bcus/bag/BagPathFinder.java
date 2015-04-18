@@ -28,6 +28,56 @@ public class BagPathFinder {
     Map<String, Vertex> nodeMap = new HashMap<String, Vertex>();
     Map<String, Edge> edgeMap = new HashMap<String, Edge>();
 
+
+    /**
+     * main entry for command line execution
+     * @param args takes only 1 argument for data file name
+     */
+    public static void main(String[] args) {
+        if (args.length != 1) {
+            usage();
+            return;
+        }
+
+        String file = args[0];
+        new BagPathFinder().runBagPathFindingForFile(file);
+    }
+
+    /**
+     * main public API method for path finding
+     * @param file  input file that contains the section data
+     */
+    public void runBagPathFindingForFile(String file) {
+        Graph graph;
+        try {
+            readSections(file);
+            graph = buildConveyorGraph();
+        } catch (IOException e) {
+            e.printStackTrace();
+            return;
+        }
+
+        // initialize algorithm with graph
+        DijkstraAlgorithm algorithm = new DijkstraAlgorithm(graph);
+
+        // initialize bag route best path request list
+        List<BagRoute> bagRoutes = buildBagRouteRequests();
+
+        // execute algorithm for each bag route request
+        for (BagRoute bagRoute : bagRoutes) {
+            algorithm.execute(bagRoute.getSourceNode());
+            bagRoute.setPath(algorithm.getPath(bagRoute.getDestinationNode()));
+            bagRoute.setTotalTravelTime(algorithm.getPathDistance(bagRoute.getPath()));
+        }
+
+        //todo: post-processing for bag route path result list
+        System.out.println("Calculated bag routes:");
+        for (BagRoute bagRoute : bagRoutes) {
+            System.out.println(formatBagRoute(bagRoute));
+        }
+    }
+
+
     /**
      * Reads section data from given file
      * @param file
@@ -104,35 +154,6 @@ public class BagPathFinder {
         return bagRouteRequests;
     }
 
-    protected void runBagPathFindingForFile(String file) {
-        Graph graph;
-        try {
-            readSections(file);
-            graph = buildConveyorGraph();
-        } catch (IOException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        // initialize algorithm with graph
-        DijkstraAlgorithm algorithm = new DijkstraAlgorithm(graph);
-
-        List<BagRoute> bagRoutes = buildBagRouteRequests();
-
-        // execute algorithm for each bag route request
-        for (BagRoute bagRoute : bagRoutes) {
-            algorithm.execute(bagRoute.getSourceNode());
-            bagRoute.setPath(algorithm.getPath(bagRoute.getDestinationNode()));
-            bagRoute.setTotalTravelTime(algorithm.getPathDistance(bagRoute.getPath()));
-        }
-
-        //todo: post-processing for bag route path result list
-        System.out.println("Calculated bag routes:");
-        for (BagRoute bagRoute : bagRoutes) {
-            System.out.println(formatBagRoute(bagRoute));
-        }
-    }
-
     private String formatBagRoute(BagRoute bagRoute) {
         StringBuilder sb = new StringBuilder(bagRoute.getRequestIndex());
         for (Vertex node : bagRoute.getPath()) {
@@ -142,20 +163,8 @@ public class BagPathFinder {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        if (args.length != 1) {
-            usage();
-            return;
-        }
 
-        String file = args[0];
-        BagPathFinder bagPathFinder = new BagPathFinder();
-        bagPathFinder.runBagPathFindingForFile(file);
-    }
 
-    private static void usage() {
-        System.out.println("Usage: java -jar bagpathfinder-<version>.jar <data_file_name>");
-    }
 
     private Vertex checkOrAddNodeWithName(Map<String, Vertex> nodeMap, String nodeName) {
         Vertex node;
@@ -168,6 +177,9 @@ public class BagPathFinder {
         return node;
     }
 
+    private static void usage() {
+        System.out.println("Usage: java -jar bagpathfinder-<version>.jar <data_file_name>");
+    }
 
 
 }

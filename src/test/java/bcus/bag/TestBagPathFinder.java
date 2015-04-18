@@ -76,24 +76,7 @@ public class TestBagPathFinder {
 
     @Test
     public void testRunBagPathFindingForFile() {
-//        Graph graph = bagPathFinder.buildConveyorGraph();
-//        List<BagRoute> bagRouteRequests = bagPathFinder.buildBagRouteRequests();
-//
-//        // initialize algorithm with graph
-//        DijkstraAlgorithm algorithm = new DijkstraAlgorithm(graph);
-//
-//        // execute algorithm for each bag route request
-//        BagRoute bagRoute = bagRouteRequests.get(0);
-//        System.out.println("calculating route request: " + bagRoute);
-//
-//            algorithm.execute(bagRoute.getSourceNode());
-//            bagRoute.setPath(algorithm.getPath(bagRoute.getDestinationNode()));
-//            bagRoute.setTotalTravelTime(algorithm.getPathDistance(bagRoute.getPath()));
-//
-//        //todo: post-processing for bag route path result list
-//        System.out.println("Calculated bag routes: " + bagRoute);
         bagPathFinder.runBagPathFindingForFile(getClass().getClassLoader().getResource("sample_data.txt").getFile());
-
     }
 
 
