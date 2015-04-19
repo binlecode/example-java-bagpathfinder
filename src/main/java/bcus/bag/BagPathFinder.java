@@ -279,7 +279,7 @@ public class BagPathFinder {
             node = nodeMap.get(nodeName);
         } else {
             node = new Vertex(nodeName, nodeName);
-            nodeMap.put(nodeName, node);
+            nodeMap.put(nodeName, node);  // assume node name is unique so can be used as key/id
         }
         return node;
     }

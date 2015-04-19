@@ -5,18 +5,26 @@ import bcus.dijkstra.Vertex;
 import java.util.List;
 
 /**
+ * Class used to contain a shortest path for a bag routing request.
+ *
  * Created by ble on 2015/4/17.
  */
 public class BagShortestPath {
 
+    /**
+     * identifies the path for each source and destination node pair
+     * id string has a format of: "<sourceNode.id>,<destinationNode.id>"
+     * @see {@link #buildPathIdFromSourceAndDestinationNodes(Vertex, Vertex)}
+     */
     private final String id;
+    /**
+     * a list contains the calculated shortest path from source node to destination node.
+     */
     private final List<Vertex> path;
+    /**
+     * the travel time of the shortest path
+     */
     private final int travelTime;
-
-    static public BagShortestPath buildPathFromRoute(BagRoute bagRoute) {
-        String id = buildPathIdFromRoute(bagRoute);
-        return new BagShortestPath(id, bagRoute.getPath(), bagRoute.getTotalTravelTime());
-    }
 
     public BagShortestPath(String id, List<Vertex> path, int travelTime) {
         this.id = id;
