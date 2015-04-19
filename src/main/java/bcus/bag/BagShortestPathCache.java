@@ -14,10 +14,6 @@ public class BagShortestPathCache {
 
     private Map<String, BagShortestPath> cache = new HashMap<String, BagShortestPath>();
 
-//    public boolean containsPathForRoute(BagRoute bagRoute) {
-//        return cache.containsKey(BagShortestPath.buildPathIdFromRoute(bagRoute));
-//    }
-
     public boolean containsPathForId(String id) {
         return cache.containsKey(id);
     }
@@ -30,10 +26,6 @@ public class BagShortestPathCache {
         return cache.get(id);
     }
 
-//    public BagShortestPath getPathByRoute(BagRoute bagRoute) {
-//        return cache.get(BagShortestPath.buildPathIdFromRoute(bagRoute));
-//    }
-
     public BagShortestPath putPath(BagShortestPath bagPath) {
         return cache.put(bagPath.getId(), bagPath);
     }
@@ -41,7 +33,5 @@ public class BagShortestPathCache {
     public int size() {
         return cache.size();
     }
-
-
 
 }

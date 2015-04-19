@@ -32,14 +32,7 @@ public class TestBagShortestPath {
     }
 
     @Test
-    public void testBuilder() {
-        bagRoute.setPath(path);
-        bagRoute.setTotalTravelTime(totalTravelTime);
-
-        BagShortestPath bagPath = BagShortestPath.buildPathFromRoute(bagRoute);
-
-        Assert.assertEquals("A1,A2", bagPath.getId());
-        Assert.assertEquals(10, bagPath.getTravelTime());
-        Assert.assertEquals(2, bagPath.getPath().size());
+    public void testBuildPathIdFromSourceAndDestinationNodes() {
+        Assert.assertEquals("A1,A2", BagShortestPath.buildPathIdFromSourceAndDestinationNodes(sourceNode, destinationNode));
     }
 }
